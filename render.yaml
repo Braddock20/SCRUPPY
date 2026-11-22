@@ -1,18 +1,23 @@
 services:
-  - type: worker
-    name: igbot-baseline-test
+  - type: web
+    name: scruppy
     runtime: docker
     plan: starter
     dockerfilePath: ./Dockerfile
     dockerContext: .
     autoDeploy: false
+    healthCheckPath: /health
     disk:
-      name: igbot-state
+      name: scruppy-state
       mountPath: /app/state
       sizeGB: 1
     envVars:
       - key: IGBOT_COOKIE
         sync: false
+      - key: IGBOT_CONTROL_TOKEN
+        sync: false
+      - key: IGBOT_AUTOSTART
+        value: "true"
       - key: IGBOT_POLL_SECONDS
         value: "60"
       - key: IGBOT_LOG_LEVEL
