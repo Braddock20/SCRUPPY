@@ -1,0 +1,11 @@
+secrets/
+state/
+logs/
+probe/
+*.db
+*.sqlite
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+config.local.yaml
