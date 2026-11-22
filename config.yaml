@@ -1,0 +1,113 @@
+# igbot configuration
+# Everything here can be edited with a plain text editor. Changes take effect
+# on the next run of the bot.
+
+account:
+  # Your Instagram username — used for reference and for the self-test.
+  username: "typical_me.11"
+
+  # Where your session cookie lives. Use "secrets/cookies.txt" (created by
+  # `igbot login --cookie`), or "-" to paste the cookie in on stdin.
+  cookies_file: "secrets/cookies.txt"
+
+  # Which domain the cookie applies to. Leave as-is.
+  cookie_domain: ".instagram.com"
+
+  # "mobile" or "desktop". Match whatever your cookie was taken from.
+  device: "mobile"
+
+browser:
+  # false = show a real window (needs a display; the wrapper script handles that)
+  headless: false
+  slow_mo_ms: 35
+  profile_dir: "state/profile"
+  proxy: ""
+  locale: "en-US"
+  viewport:
+    width: 414
+    height: 863
+    device_scale_factor: 2.608695652173913
+    is_mobile: true
+    has_touch: true
+
+urls:
+  base: "https://www.instagram.com"
+
+behaviour:
+  # How often to check for new messages (seconds).
+  poll_seconds: 45
+
+  # How long to wait before replying, randomised inside this range (seconds).
+  # People do not reply instantly. Neither should the bot.
+  reply_delay_min: 12
+  reply_delay_max: 55
+
+  # Minimum gap between two replies in the same conversation (seconds).
+  cooldown_seconds: 900
+
+  # Reply caps. These are what stops a busy day from turning into a flood.
+  hourly_cap: 8
+  daily_cap: 25
+  global_daily_cap: 120
+
+  # When true the bot reads and logs messages but never replies.
+  # Turn this on for the first few days.
+  baseline_only: true
+
+  # Whether the bot is allowed to accept message requests. Off by default:
+  # accepting a request is a visible action, so you should decide it yourself.
+  accept_requests: false
+
+  # Which inbox tabs to read.
+  tabs: ["Primary", "Requests"]
+
+reply:
+  # Sent when nothing more specific matches.
+  default_reply: "Thanks for reaching out! We've got your message and will reply shortly."
+
+  # The rulebook. Order does not matter — the most specific match wins.
+  # Matching is on word boundaries, so "hi" will NOT fire on "shipping".
+  rules:
+    - name: pricing
+      match: ["price", "pricing", "how much", "cost"]
+      reply: "Happy to help with pricing! What are you looking to order?"
+
+    - name: shipping
+      match: ["shipping", "delivery", "how long", "postage"]
+      reply: "We ship nationwide. Could you tell me where you're based?"
+
+    - name: returns
+      match: ["return", "refund", "exchange"]
+      reply: "We accept returns within 30 days. Which order is this about?"
+
+    - name: stock
+      match: ["in stock", "available", "do you have"]
+      reply: "Let me check availability for you — which item are you after?"
+
+    - name: greeting
+      match: ["hi", "hello", "hey", "good morning", "good evening"]
+      reply: "Hi there! How can I help?"
+
+    - name: thanks
+      match: ["thanks", "thank you", "cheers"]
+      reply: "Happy to help! Anything else I can do for you?"
+
+  # Optional AI replies. Off by default. Works with any OpenAI-compatible
+  # endpoint. If the AI is down or slow, the rules above are used instead and
+  # your customer is never left without an answer.
+  ai:
+    enabled: false
+    endpoint: ""
+    api_key_env: "OPENAI_API_KEY"
+    model: "gpt-4o-mini"
+    timeout: 20
+    max_tokens: 160
+
+publishing:
+  caption_file: ""
+  media_file: ""
+  media_url: ""
+
+logging:
+  level: "INFO"
+  file: "logs/igbot.log"
