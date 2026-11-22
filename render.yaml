@@ -1,0 +1,23 @@
+services:
+  - type: worker
+    name: igbot-baseline-test
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeploy: false
+    disk:
+      name: igbot-state
+      mountPath: /app/state
+      sizeGB: 1
+    envVars:
+      - key: IGBOT_COOKIE
+        sync: false
+      - key: IGBOT_POLL_SECONDS
+        value: "60"
+      - key: IGBOT_LOG_LEVEL
+        value: INFO
+      - key: IGBOT_PROFILE_DIR
+        value: /app/state/profile
+      - key: IGBOT_LOG_FILE
+        value: /app/state/igbot.log
