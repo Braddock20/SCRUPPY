@@ -1,0 +1,52 @@
+# Instagram DOM selectors — every fragile selector lives here.
+#
+# Verified live against instagram.com on 2026-11-22 (mobile layout, 414x863).
+# If Instagram redesigns, fix this file and nothing else.
+#
+# Facts that are easy to get wrong, recorded here so they are not re-learned:
+#   * There is no <header> element and no div[role="grid"] in the DM UI.
+#   * <main> holds BOTH the inbox rail and the conversation pane, so a
+#     selector scoped to <main> matches previews as well as message bodies.
+#   * Rail previews and message bodies use the SAME markup.
+#   * Inbox tabs are role="tab" inside a role="tablist": Primary | General | Requests
+#   * Conversation rows are div[role="button"] with NO href — they must be clicked.
+#   * Request rows also have no href, and a request thread has NO composer
+#     until the request is accepted (Accept / Block / Delete buttons instead).
+#   * The "What's new" carousel also uses div[role="button"], but its rows have
+#     no "·" separator, which is what distinguishes a conversation row.
+
+inbox:
+  url: "/direct/inbox/"
+  tablist: '[role="tablist"]'
+  tab: '[role="tab"]'
+  new_message_button: '[aria-label="New message"]'
+  search_input: 'input[placeholder="Search..."], [role="textbox"][placeholder="Search..."]'
+  row: 'div[role="button"]'
+  scroll_container: 'div[role="main"], main'
+
+conversation:
+  # The composer. The real text input is a contenteditable div with role=textbox.
+  composer: 'div[role="textbox"][contenteditable="true"]'
+  # The send control only exists once there is text in the composer.
+  send_button: 'div[role="button"][aria-label="Send"], button[aria-label="Send"]'
+  # Buttons on an unaccepted message request.
+  accept_button: 'div[role="button"]:has-text("Accept"), button:has-text("Accept")'
+  back_button: '[aria-label="Back"]'
+  # A bubble's coloured container. Outgoing = Instagram blue, incoming = grey.
+  bubble_container: 'div[role="presentation"]'
+
+publish:
+  create_button: '[aria-label="Create"]'
+  post_option: 'text="Post"'
+  caption_input: 'div[aria-label="Caption"][contenteditable="true"], textarea[aria-label="Caption"]'
+  share_button: 'button:has-text("Share"), div[role="button"]:has-text("Share")'
+
+overlay:
+  # Buttons that dismiss first-run modals (notification permission etc).
+  dismiss_labels:
+    - "Not Now"
+    - "Not now"
+    - "Later"
+    - "Close"
+    - "Skip"
+    - "Dismiss"
