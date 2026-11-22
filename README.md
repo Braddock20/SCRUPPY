@@ -10,6 +10,14 @@ prompt in the middle of the night, and no lost logins.
 
 ---
 
+
+## Render Web Service
+
+The Docker image starts `python -m igbot.web`, which exposes `/health` and
+`/status` while managing the existing `igbot watch` process separately. See
+[`RENDER_DEPLOY.md`](RENDER_DEPLOY.md) for Render environment variables, the
+Bearer-token-protected start/stop endpoints, and safe baseline testing.
+
 ## Read this first: the honest risk
 
 Automating Instagram through a browser is against Instagram's terms of service.
