@@ -1,0 +1,40 @@
+[Unit]
+Description=igbot — Instagram DM auto-reply bot
+Documentation=file:///opt/ig-bot/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=igbot
+WorkingDirectory=/opt/ig-bot
+
+# A virtual display, because the browser needs a real window to draw into.
+Environment=DISPLAY=:99
+ExecStartPre=/usr/bin/Xvfb :99 -screen 0 1440x900x24 -nolisten tcp
+ExecStart=/opt/ig-bot/.venv/bin/python -m igbot watch
+Restart=always
+RestartSec=30
+KillSignal=SIGTERM
+TimeoutStopSec=45
+
+# Give the browser room to breathe.
+LimitNOFILE=8192
+Environment=PYTHONUNBUFFERED=1
+
+# Hardening. The bot only needs its own directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/ig-bot/state /opt/ig-bot/logs
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=igbot
+
+[Install]
+WantedBy=multi-user.target
