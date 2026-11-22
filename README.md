@@ -89,6 +89,19 @@ Save it into the file `secrets/cookies.txt` (one line, no line breaks), then:
 It will say `Logged in as yourhandle`. The file is stored with owner-only
 permissions.
 
+### Supported cookie file formats
+
+`igbot login --cookie-file secrets/cookies.txt` auto-detects:
+
+- Netscape/Mozilla `cookies.txt` exports (seven-column tab-separated format,
+  including `#HttpOnly_` rows and per-cookie domain/path/secure/expiry).
+- Browser-export JSON arrays, including `{ "cookies": [...] }`.
+- A standard `Cookie:` header (`name=value; name=value`).
+
+No conversion is required. Expired Netscape cookies are ignored. Keep cookie
+files private: they grant access to your account. Never commit them to Git or
+share them in screenshots, chats, or support tickets.
+
 ### 2. Check everything works
 
 ```bash
