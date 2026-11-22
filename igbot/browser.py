@@ -6,7 +6,7 @@ Responsibilities:
   device that has been logging in for weeks rather than a brand new one;
 * a first-class **cookie login** path — paste the browser's ``Cookie:`` header
   and you are in, no form automation and no second-factor prompt;
-* stealth hygiene, so the session does not advertise itself as automated;
+* ordinary Playwright browser operation without fingerprint masking;
 * honest detection of whether we are actually logged in, and of the
   checkpoint / "confirm it's you" screens that must never be pushed through
   automatically.
@@ -54,72 +54,6 @@ _LOGIN_WALL_MARKERS = (
     "see photos and videos",
     "create an account",
 )
-
-_STEALTH_SCRIPT = """
-(() => {
-  // --- navigator.webdriver ---------------------------------------------
-  try {
-    Object.defineProperty(Navigator.prototype, 'webdriver', {
-      get: () => undefined,
-      configurable: true,
-    });
-    delete Object.getPrototypeOf(navigator).webdriver;
-  } catch (e) {}
-
-  // --- window.chrome runtime -------------------------------------------
-  try {
-    if (!window.chrome) { window.chrome = {}; }
-    if (!window.chrome.runtime) {
-      window.chrome.runtime = {
-        id: undefined,
-        connect: () => ({}),
-        sendMessage: () => {},
-      };
-    }
-  } catch (e) {}
-
-  // --- plugins / mimeTypes (headless Chromium reports none) -------------
-  try {
-    const makeArray = (props) => {
-      const out = [];
-      props.forEach((p, i) => out.push({ name: p, description: p }));
-      out.item = (i) => out[i];
-      return out;
-    };
-    const fake = makeArray(['PDF Viewer', 'Chrome PDF Viewer', 'Chromium PDF Viewer']);
-    Object.defineProperty(navigator, 'plugins', { get: () => fake, configurable: true });
-    Object.defineProperty(navigator, 'mimeTypes', {
-      get: () => makeArray(['application/pdf']),
-      configurable: true,
-    });
-  } catch (e) {}
-
-  // --- permissions query consistency ------------------------------------
-  try {
-    const originalQuery = window.navigator.permissions && window.navigator.permissions.query;
-    if (originalQuery) {
-      window.navigator.permissions.query = (params) =>
-        params && params.name === 'notifications'
-          ? Promise.resolve({ state: Notification.permission, onchange: null })
-          : originalQuery.call(window.navigator.permissions, params);
-    }
-  } catch (e) {}
-
-  // --- webgl vendor/renderer --------------------------------------------
-  try {
-    const getParameter = WebGLRenderingContext.prototype.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function (p) {
-      if (p === 37445) return 'Google Inc. (Intel)';
-      if (p === 37446) return 'ANGLE (Intel, Mesa Intel(R) UHD Graphics, OpenGL 4.6)';
-      return getParameter.call(this, p);
-    };
-  } catch (e) {}
-})();
-"""
-
-# Chromium flags that would otherwise advertise automation.
-_IGNORE_FLAGS = ("--enable-automation", "--disable-blink-features=AutomationControlled")
-
 
 def parse_cookie_header(header: str) -> list[dict]:
     """Parse a raw ``Cookie:`` header into Playwright cookie dicts.
@@ -239,11 +173,9 @@ class Browser:
 
         self._pw = sync_playwright().start()
         args = [
-            "--disable-blink-features=AutomationControlled",
             "--disable-dev-shm-usage",
             "--no-first-run",
             "--no-default-browser-check",
-            "--disable-features=IsolateOrigins,site-per-process",
         ]
         proxy = str(self.cfg.get("browser.proxy", "") or "")
 
@@ -261,7 +193,6 @@ class Browser:
             "user_data_dir": str(profile_dir),
             "headless": self.headless,
             "args": args,
-            "ignore_default_args": list(_IGNORE_FLAGS),
             "viewport": device["viewport"],
             "device_scale_factor": device["device_scale_factor"],
             "is_mobile": device["is_mobile"],
@@ -277,7 +208,6 @@ class Browser:
 
         self.context = self._pw.chromium.launch_persistent_context(**context_kwargs)
         self.context.set_default_timeout(30000)
-        self.context.add_init_script(_STEALTH_SCRIPT)
 
         # launch_persistent_context usually hands back one blank page.
         if self.context.pages:
