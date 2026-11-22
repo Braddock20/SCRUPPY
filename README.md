@@ -16,18 +16,16 @@ Automating Instagram through a browser is against Instagram's terms of service.
 You accept that risk by running this. Here is what the bot does to keep it
 small, and what it cannot do:
 
-**What it does to stay low-profile**
+**Safety and testing behavior**
 
-- One persistent browser profile. Instagram sees the same device logging in
-  every day, not a new one each time.
-- A real window on a real browser, with the automation flags stripped out.
-- Replies are delayed 12–55 seconds, randomly, like a person who looked at
-  their phone.
-- A 15-minute cooldown per conversation, plus hourly, daily and global caps.
-- It stops completely and waits for you if Instagram ever shows a
-  "confirm it's you" or checkpoint screen. It will never push through one.
-- It only ever talks to you. It never posts, follows, likes or browses other
-  accounts.
+- The Render deployment is configured for read-only baseline mode. It reads
+  the inbox and records what it sees; it does not send replies.
+- It uses ordinary Playwright browser behavior and does not mask automation
+  signals or attempt to bypass Instagram security checks.
+- It stops and waits for you if Instagram displays a checkpoint, identity
+  confirmation, or unusual-activity screen. Do not automate that challenge.
+- Browser automation may be restricted by Instagram and can stop working when
+  the site changes. Use official Meta APIs where they support your use case.
 
 **What it cannot do**
 
